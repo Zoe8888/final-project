@@ -336,11 +336,11 @@ def registration():
 
     if request.method == "POST":
 
-        name = request.form['name']
-        surname = request.form['surname']
-        email = request.form['email']
-        username = request.form['username']
-        password = request.form['password']
+        name = request.json['name']
+        surname = request.json['surname']
+        email = request.json['email']
+        username = request.json['username']
+        password = request.json['password']
 
         with sqlite3.connect('blog.db') as conn:
             cursor = conn.cursor()
@@ -399,8 +399,8 @@ def login():
     response = {}
 
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.json['username']
+        password = request.json['password']
 
         with sqlite3.connect('blog.db') as conn:
             cursor = conn.cursor()
@@ -499,11 +499,11 @@ def create_post():
     response = {}
 
     if request.method == "POST":
-        image = request.files['post_image']
-        title = request.form['title']
-        content = request.form['content']
-        author = request.form['author']
-        id = request.form['id']
+        image = request.json['post_image']
+        title = request.json['title']
+        content = request.json['content']
+        author = request.json['author']
+        id = request.json['id']
 
         print(title, content, author, id)
 
