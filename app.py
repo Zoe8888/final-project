@@ -136,7 +136,7 @@ class Database(object):
         if post_image:
             upload_result = cloudinary.uploader.upload(post_image)
             app.logger.info(upload_result)
-        date_created = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        date_created = datetime.datetime.now().strftime("%m/%d/%Y")
 
         self.cursor.execute("INSERT INTO posts(post_image, title, content, author, date_created, id) "
                             "VALUES(?, ?, ?, ?, ?, ?)",
