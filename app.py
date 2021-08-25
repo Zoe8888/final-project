@@ -188,6 +188,16 @@ class Database(object):
                 response['status_code'] = 200
                 response['message'] = "Post author was successfully updated."
 
+        # Edit date created of post
+        if incoming_data.get('date_created') is not None:
+            put_data['date_created'] = incoming_data.get('date_created')
+            with sqlite3.connect('blog.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute("UPDATE posts SET date_created =? WHERE post_id=?", (put_data['date_created'], post_id))
+                conn.commit()
+                response['status_code'] = 200
+                response['message'] = "Post creation date was successfully updated."
+
         # Edit user id of post
         if incoming_data.get('id') is not None:
             put_data['id'] = incoming_data.get('author')
