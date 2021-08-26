@@ -57,9 +57,27 @@ class Database(object):
         return response
 
     # Edit user profile function
-    def edit_profile(self, incoming_data, username):
+    def edit_profile(self, user_image, incoming_data, username):
         response = {}
         put_data = {}
+
+        # If the user image is edited
+        if incoming_data.get('user_image') is not None:
+            put_data['user_image'] = incoming_data.get('user_image')
+
+            cloudinary.config(cloud_name='dxgylrfai', api_key='297452228378499',
+                              api_secret='lMfu9nSDHtFhnaRTiEch_gfzm_A')
+            upload_result = None
+            app.logger.info('%s file_to_upload', put_data['user_image'])
+            if user_image:
+                upload_result = cloudinary.uploader.upload(put_data['user_image'])
+                app.logger.info(upload_result)
+            with sqlite3.connect('blog.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute("UPDATE users SET user_image =? WHERE username=?", (upload_result['url'], username))
+                conn.commit()
+                response['status_code'] = 200
+                response['message'] = "User image successfully updated"
 
         # If the name is edited
         if incoming_data.get('name') is not None:
@@ -110,16 +128,6 @@ class Database(object):
                 conn.commit()
                 response['status_code'] = 200
                 response['message'] = "Password successfully updated"
-
-        # If the user image is edited
-        if incoming_data.get('user_image') is not None:
-            put_data['user_image'] = incoming_data.get('user_image')
-            with sqlite3.connect('blog.db') as conn:
-                cursor = conn.cursor()
-                cursor.execute("UPDATE users SET user_image =? WHERE username=?", (put_data['user_image'], username))
-                conn.commit()
-                response['status_code'] = 200
-                response['message'] = "User image successfully updated"
 
         return response
 
