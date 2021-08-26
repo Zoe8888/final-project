@@ -470,7 +470,7 @@ def edit_profile(username):
     if request.method == "PUT":
         incoming_data = dict(request.json)
         db = Database()
-        response = db.edit_profile(incoming_data, id)
+        response = db.edit_profile(incoming_data, username)
 
     return response
 
@@ -481,7 +481,7 @@ def edit_profile(username):
 def delete_profile(username):
     response = {}
     db = Database()
-    db.delete_profile(id)
+    db.delete_profile(username)
 
     response['status_code'] = 200
     response['message'] = "Profile successfully deleted"
