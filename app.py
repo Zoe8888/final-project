@@ -57,7 +57,7 @@ class Database(object):
         return response
 
     # Edit user profile function
-    def edit_profile(self, user_image, incoming_data, username):
+    def edit_profile(self, incoming_data, username):
         response = {}
         put_data = {}
 
@@ -69,7 +69,7 @@ class Database(object):
                               api_secret='lMfu9nSDHtFhnaRTiEch_gfzm_A')
             upload_result = None
             app.logger.info('%s file_to_upload', put_data['user_image'])
-            if user_image:
+            if put_data['user_image']:
                 upload_result = cloudinary.uploader.upload(put_data['user_image'])
                 app.logger.info(upload_result)
             with sqlite3.connect('blog.db') as conn:
