@@ -57,7 +57,7 @@ class Database(object):
         return response
 
     # Edit user profile function
-    def edit_profile(self, incoming_data, id):
+    def edit_profile(self, incoming_data, username):
         response = {}
         put_data = {}
 
@@ -66,7 +66,7 @@ class Database(object):
             put_data['name'] = incoming_data.get('name')
             with sqlite3.connect('blog.db') as conn:
                 cursor = conn.cursor()
-                cursor.execute("UPDATE users SET name =? WHERE id =?", (put_data['name'], id))
+                cursor.execute("UPDATE users SET name =? WHERE username =?", (put_data['name'], username))
                 conn.commit()
                 response['status_code'] = 200
                 response['message'] = "Name successfully updated"
@@ -76,7 +76,7 @@ class Database(object):
             put_data['surname'] = incoming_data.get('surname')
             with sqlite3.connect('blog.db') as conn:
                 cursor = conn.cursor()
-                cursor.execute("UPDATE users SET surname =? WHERE id=?", (put_data['surname'], id))
+                cursor.execute("UPDATE users SET surname =? WHERE username=?", (put_data['surname'], username))
                 conn.commit()
                 response['status_code'] = 200
                 response['message'] = "Surname successfully updated"
@@ -86,7 +86,7 @@ class Database(object):
             put_data['email'] = incoming_data.get('email')
             with sqlite3.connect('blog.db') as conn:
                 cursor = conn.cursor()
-                cursor.execute("UPDATE users SET email =? WHERE id=?", (put_data['email'], id))
+                cursor.execute("UPDATE users SET email =? WHERE username=?", (put_data['email'], username))
                 conn.commit()
                 response['status_code'] = 200
                 response['message'] = "ID number successfully updated"
@@ -96,7 +96,7 @@ class Database(object):
             put_data['username'] = incoming_data.get('username')
             with sqlite3.connect('blog.db') as conn:
                 cursor = conn.cursor()
-                cursor.execute("UPDATE users SET username =? WHERE id=?", (put_data['username'], id))
+                cursor.execute("UPDATE users SET username =? WHERE username=?", (put_data['username'], username))
                 conn.commit()
                 response['status_code'] = 200
                 response['message'] = "Username successfully updated"
@@ -106,7 +106,7 @@ class Database(object):
             put_data['password'] = incoming_data.get('password')
             with sqlite3.connect('blog.db') as conn:
                 cursor = conn.cursor()
-                cursor.execute("UPDATE users SET password =? WHERE id=?", (put_data['password'], id))
+                cursor.execute("UPDATE users SET password =? WHERE username=?", (put_data['password'], username))
                 conn.commit()
                 response['status_code'] = 200
                 response['message'] = "Password successfully updated"
@@ -116,7 +116,7 @@ class Database(object):
             put_data['user_image'] = incoming_data.get('user_image')
             with sqlite3.connect('blog.db') as conn:
                 cursor = conn.cursor()
-                cursor.execute("UPDATE users SET user_image =? WHERE id =?", (put_data['user_image'], id))
+                cursor.execute("UPDATE users SET user_image =? WHERE username=?", (put_data['user_image'], username))
                 conn.commit()
                 response['status_code'] = 200
                 response['message'] = "User image successfully updated"
@@ -394,7 +394,7 @@ def send_email(email):
     response = {}
     mail = Mail(app)
     msg = Message("Welcome!", sender='crystalcavecpt@gmail.com', recipients=[email])
-    msg.body = "Good morning/afternoon {}.\n You have successfully registered your profile on our site.\n" \
+    msg.body = "Good morning/afternoon.\n You have successfully registered your profile on our site.\n" \
                "Please feel free to send us an email if you have any queries or concerns.\n \n" \
                "Kind Regards,\n Crystal Cave Team"
     mail.send(msg)
