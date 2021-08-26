@@ -462,9 +462,9 @@ def view_profile(username):
 
 
 # App route for the user to edit their profile
-@app.route('/edit-profile/<int:id>/', methods=["PUT"])
+@app.route('/edit-profile/<username>/', methods=["PUT"])
 @jwt_required()
-def edit_profile(id):
+def edit_profile(username):
     response = {}
 
     if request.method == "PUT":
