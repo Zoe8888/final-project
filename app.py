@@ -476,9 +476,9 @@ def edit_profile(username):
 
 
 # App route for the user to delete their profile
-@app.route('/delete-profile/<int:id>/')
+@app.route('/delete-profile/<username>/')
 @jwt_required()
-def delete_profile(id):
+def delete_profile(username):
     response = {}
     db = Database()
     db.delete_profile(id)
