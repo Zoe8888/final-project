@@ -22,8 +22,9 @@ class User(object):
 
 # Creating a product class
 class Post(object):
-    def __init__(self, post_id, title, intro, body, conclusion, author, date_created, id):
+    def __init__(self, post_id, post_image, title, intro, body, conclusion, author, date_created, id):
         self.post_id = post_id
+        self.post_image = post_image
         self.title = title
         self.intro = intro
         self.body = body
@@ -31,6 +32,22 @@ class Post(object):
         self.author = author
         self.date_created = date_created
         self.id = id
+
+
+# Creating a like class
+class Like(object):
+    def __init__(self, id, post_id):
+        self.id = id
+        self.post_id = post_id
+
+
+# Creating a comment class
+class Comment(object):
+    def __init__(self, comment_id, comment, id, post_id):
+        self.comment_id = comment_id
+        self.comment = comment
+        self.id = id
+        self.post_id = post_id
 
 
 # Creating a database class
@@ -148,8 +165,8 @@ class Database(object):
             app.logger.info(upload_result)
         date_created = datetime.datetime.now().strftime("%m/%d/%Y")
 
-        self.cursor.execute("INSERT INTO posts(post_image, title, intro, body, conclusiono, author, date_created, id) "
-                            "VALUES(?, ?, ?, ?, ?, ?)",
+        self.cursor.execute("INSERT INTO posts(post_image, title, intro, body, conclusion, author, date_created, id) "
+                            "VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
                             (upload_result['url'], title, intro, body, conclusion, author, date_created, id))
         self.conn.commit()
 
@@ -256,10 +273,35 @@ class Database(object):
         response = self.cursor.fetchone()
         return response
 
-    # Display a specific users posts
+    # Display a specific users posts function
     def view_users_posts(self, value):
         self.cursor.execute("SELECT * FROM posts WHERE id='{}'".format(value))
         return self.cursor.fetchall()
+
+    # Creating a like function
+    def like(self, id, post_id):
+        self.cursor.execute("INSERT INTO likes(id, post_id) VALUES(?, ?)", (id, post_id))
+        self.conn.commit()
+
+    # Adding a comment function
+    def add_comment(self, comment, id, post_id):
+        self.cursor.execute("INSERT INTO comments(comment, id, post_id) VALUES(?, ?, ?)", (comment, id, post_id))
+        self.conn.commit()
+
+    # Display comment function
+    def display_comments(self, value):
+        self.cursor.execute("SELECT * FROM comments WHERE post_id='{}'".format(value))
+        return self.cursor.fetchall()
+
+    # Editing a comment function
+    def edit_comment(self, comment, comment_id):
+        self.cursor.execute("UPDATE comments SET comment='{}' WHERE comment_id='{}'".format(comment, comment_id))
+        self.conn.commit()
+
+    # Deleting a comment function
+    def delete_comment(self, value):
+        self.cursor.execute("DELETE FROM comments WHERE comment_id='{}'".format(value))
+        self.conn.commit()
 
 
 # Creating a user table
@@ -289,9 +331,30 @@ def init_post_table():
                      "conclusion TEXT NOT NULL,"
                      "author TEXT NOT NULL,"
                      "date_created TEXT NOT NULL,"
-                     "id INTEGER TEXT NULL,"
+                     "id INTEGER NOT NULL,"
                      "FOREIGN KEY (id) REFERENCES users(id))")
     print("Post table created successfully.")
+
+
+# Create a like table
+def init_like_table():
+    with sqlite3.connect('blog.db') as conn:
+        conn.execute("CREATE TABLE IF NOT EXISTS likes(id INTEGER NOT NULL, post_id TEXT NOT NULL,"
+                     "FOREIGN KEY (id) REFERENCES users(id),"
+                     "FOREIGN KEY (post_id) REFERENCES posts(post_id))")
+    print("Like table created successfully.")
+
+
+# Create a comment table
+def init_comment_table():
+    with sqlite3.connect('blog.db') as conn:
+        conn.execute("CREATE TABLE IF NOT EXISTS comments(comment_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "comment TEXT NOT NULL,"
+                     "id INTEGER NOT NULL,"
+                     "post_id TEXT NOT NULL,"
+                     "FOREIGN KEY (id) REFERENCES users(id),"
+                     "FOREIGN KEY (post_id) REFERENCES posts(post_id))")
+    print("Comment table created successfully.")
 
 
 # Fetching all users
@@ -323,14 +386,50 @@ def fetch_blog_posts():
     return new_data
 
 
+# Fetching all likes
+def fetch_likes():
+    with sqlite3.connect('blog.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM likes")
+        likes = cursor.fetchall()
+
+        new_data = []
+
+        for data in likes:
+            new_data.append(Like(data[0], data[1]))
+    return new_data
+
+
+# Fetching all comments
+def fetch_comments():
+    with sqlite3.connect('blog.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM comments")
+        comments = cursor.fetchall()
+
+        new_data = []
+
+        for data in comments:
+            new_data.append(Comment(data[0], data[1], data[2], data[3]))
+    return new_data
+
+
 # Initializing user table
 init_user_table()
 # Initializing product table
 init_post_table()
+# Initializing like table
+init_like_table()
+# Initializing comment table
+init_comment_table()
 # Creating list of all users
 users = fetch_users()
 # Creating a list of all the posts
 blog_posts = fetch_blog_posts()
+# Creating list of all likes
+likes = fetch_likes()
+# Creating list of all comments
+comments = fetch_comments()
 
 
 username_table = {u.username: u for u in users}
@@ -380,11 +479,11 @@ def registration():
 
     if request.method == "POST":
 
-        name = request.json['name']
-        surname = request.json['surname']
-        email = request.json['email']
-        username = request.json['username']
-        password = request.json['password']
+        name = request.form['name']
+        surname = request.form['surname']
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['password']
 
         with sqlite3.connect('blog.db') as conn:
             cursor = conn.cursor()
@@ -543,15 +642,15 @@ def create_post():
     response = {}
 
     if request.method == "POST":
-        image = request.json['post_image']
-        title = request.json['title']
-        content = request.json['content']
-        author = request.json['author']
-        id = request.json['id']
+        image = request.files['post_image']
+        title = request.form['title']
+        intro = request.form['intro']
+        body = request.form['body']
+        conclusion = request.form['conclusion']
+        author = request.form['author']
+        id = request.form['id']
 
-        print(title, content, author, id)
-
-        db.create_post(image, title, content, author, id)
+        db.create_post(image, title, intro, body, conclusion, author, id)
         response["status_code"] = 200
         response['description'] = "Post created successfully"
         return response
@@ -623,6 +722,83 @@ def view_users_products(id):
     response['message'] = "All posts from user retrieved successfully"
     response['data'] = user_posts
 
+    return response
+
+
+# App route to like a post
+@app.route('/like-post/', methods=["POST"])
+@jwt_required()
+def like_post():
+    response = {}
+    db = Database()
+
+    if request.method == "POST":
+        id = request.form['id']
+        post_id = request.form['post_id']
+
+        db.like(id, post_id)
+        response['status_code'] = 200
+        response['message'] = "Post liked successfully"
+        return response
+
+
+# App route to add a comment to a post
+@app.route('/add-comment/', methods=["POST"])
+@jwt_required()
+def add_comment():
+    response = {}
+    db = Database()
+
+    if request.method == "POST":
+        comment = request.form['comment']
+        id = request.form['id']
+        post_id = request.form['post_id']
+
+        db.add_comment(comment, id, post_id)
+        response['status_code'] = 200
+        response['message'] = "Comment added to post successfully"
+        return response
+
+
+# App route to display comments
+@app.route('/display-comments/<post_id>/', methods=["GET"])
+def display_comments(post_id):
+    response = {}
+    db = Database()
+
+    comments = db.display_comments(post_id)
+    response['status_code'] = 200
+    response['message'] = "All comments from post successfully retrieved"
+    response['data'] = comments
+    return response
+
+
+# App route to edit a comment
+@app.route('/edit-comment/<int:comment_id>/', methods=["PUT"])
+@jwt_required()
+def edit_comment(comment_id):
+    response = {}
+    db = Database()
+
+    if request.method == "PUT":
+        comment = request.json['comment']
+        db.edit_comment(comment, comment_id)
+        response['status_code'] = 200
+        response['message'] = "Comment successfully edited"
+
+    return response
+
+
+# App route to delete a comment
+@app.route('/delete-comment/<int:comment_id>/')
+@jwt_required()
+def delete_comment(comment_id):
+    response = {}
+    db = Database()
+
+    db.delete_comment(comment_id)
+    response['status_code'] = 200
+    response['message'] = "Comment successfully deleted"
     return response
 
 
