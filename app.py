@@ -22,10 +22,12 @@ class User(object):
 
 # Creating a product class
 class Post(object):
-    def __init__(self, post_id, title, content, author, date_created, id):
+    def __init__(self, post_id, title, intro, body, conclusion, author, date_created, id):
         self.post_id = post_id
         self.title = title
-        self.content = content
+        self.intro = intro
+        self.body = body
+        self.conclusion = conclusion
         self.author = author
         self.date_created = date_created
         self.id = id
@@ -137,7 +139,7 @@ class Database(object):
         self.conn.commit()
 
     # Add new post function
-    def create_post(self, post_image, title, content, author, id):
+    def create_post(self, post_image, title, intro, body, conclusion, author, id):
         cloudinary.config(cloud_name='dxgylrfai', api_key='297452228378499', api_secret='lMfu9nSDHtFhnaRTiEch_gfzm_A')
         upload_result = None
         app.logger.info('%s file_to_upload', post_image)
@@ -146,9 +148,9 @@ class Database(object):
             app.logger.info(upload_result)
         date_created = datetime.datetime.now().strftime("%m/%d/%Y")
 
-        self.cursor.execute("INSERT INTO posts(post_image, title, content, author, date_created, id) "
+        self.cursor.execute("INSERT INTO posts(post_image, title, intro, body, conclusiono, author, date_created, id) "
                             "VALUES(?, ?, ?, ?, ?, ?)",
-                            (upload_result['url'], title, content, author, date_created, id))
+                            (upload_result['url'], title, intro, body, conclusion, author, date_created, id))
         self.conn.commit()
 
     # Edit post function
@@ -176,15 +178,35 @@ class Database(object):
                 response['status_code'] = 200
                 response['message'] = "Post image was successfully updated."
 
-        # Edit content of post
-        if incoming_data.get('content') is not None:
-            put_data['content'] = incoming_data.get('content')
+        # Edit intro of post
+        if incoming_data.get('intro') is not None:
+            put_data['intro'] = incoming_data.get('intro')
             with sqlite3.connect('blog.db') as conn:
                 cursor = conn.cursor()
-                cursor.execute("UPDATE posts SET content =? WHERE post_id=?", (put_data['content'], post_id))
+                cursor.execute("UPDATE posts SET intro =? WHERE post_id=?", (put_data['intro'], post_id))
                 conn.commit()
                 response['status_code'] = 200
-                response['message'] = "Post content was successfully updated."
+                response['message'] = "Post intro was successfully updated."
+
+        # Edit body of post
+        if incoming_data.get('body') is not None:
+            put_data['body'] = incoming_data.get('intro')
+            with sqlite3.connect('blog.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute("UPDATE posts SET body =? WHERE post_id=?", (put_data['body'], post_id))
+                conn.commit()
+                response['status_code'] = 200
+                response['message'] = "Post body was successfully updated."
+
+        # Edit conclusion of post
+        if incoming_data.get('conclusion') is not None:
+            put_data['conclusion'] = incoming_data.get('intro')
+            with sqlite3.connect('blog.db') as conn:
+                cursor = conn.cursor()
+                cursor.execute("UPDATE posts SET conclusion =? WHERE post_id=?", (put_data['conclusion'], post_id))
+                conn.commit()
+                response['status_code'] = 200
+                response['message'] = "Post conclusion was successfully updated."
 
         # Edit author of post
         if incoming_data.get('author') is not None:
@@ -262,7 +284,9 @@ def init_post_table():
         conn.execute("CREATE TABLE IF NOT EXISTS posts(post_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                      "post_image TEXT NOT NULL,"
                      "title TEXT NOT NULL,"
-                     "content TEXT NOT NULL,"
+                     "intro TEXT NOT NULL,"
+                     "body TEXT NOT NULL,"
+                     "conclusion TEXT NOT NULL,"
                      "author TEXT NOT NULL,"
                      "date_created TEXT NOT NULL,"
                      "id INTEGER TEXT NULL,"
@@ -295,7 +319,7 @@ def fetch_blog_posts():
         new_data = []
 
         for data in posts:
-            new_data.append(Post(data[0], data[1], data[2], data[3], data[4], data[5]))
+            new_data.append(Post(data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8]))
     return new_data
 
 
