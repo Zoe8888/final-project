@@ -739,8 +739,8 @@ def like_post():
     db = Database()
 
     if request.method == "POST":
-        username = request.form['username']
-        post_id = request.form['post_id']
+        username = request.json['username']
+        post_id = request.json['post_id']
 
         db.like(username, post_id)
         response['status_code'] = 200
@@ -769,9 +769,9 @@ def add_comment():
     db = Database()
 
     if request.method == "POST":
-        comment = request.form['comment']
-        username = request.form['username']
-        post_id = request.form['post_id']
+        comment = request.json['comment']
+        username = request.json['username']
+        post_id = request.json['post_id']
 
         db.add_comment(comment, username, post_id)
         response['status_code'] = 200
