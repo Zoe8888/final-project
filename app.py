@@ -283,6 +283,11 @@ class Database(object):
         self.cursor.execute("INSERT INTO likes(id, post_id) VALUES(?, ?)", (id, post_id))
         self.conn.commit()
 
+    # Displays likes on a post function
+    def display_likes(self, post_id):
+        self.cursor.execute("SELECT * FROM likes WHERE post_id='{}'".format(post_id))
+        return self.cursor.fetchall()
+
     # Adding a comment function
     def add_comment(self, comment, id, post_id):
         self.cursor.execute("INSERT INTO comments(comment, id, post_id) VALUES(?, ?, ?)", (comment, id, post_id))
@@ -740,6 +745,19 @@ def like_post():
         response['status_code'] = 200
         response['message'] = "Post liked successfully"
         return response
+
+
+# App route to display all likes on a post
+@app.route('/display-likes/<int:post_id>/', methods=["GET"])
+def display_likes(post_id):
+    response = {}
+    db = Database()
+
+    likes = db.display_likes(post_id)
+    response['data'] = likes
+    response['status_code'] = 200
+    response['message'] = "All likes from post retrieved successfully"
+    return response
 
 
 # App route to add a comment to a post
