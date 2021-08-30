@@ -279,8 +279,8 @@ class Database(object):
         return self.cursor.fetchall()
 
     # Creating a like function
-    def like(self, id, post_id):
-        self.cursor.execute("INSERT INTO likes(id, post_id) VALUES(?, ?)", (id, post_id))
+    def like(self, username, post_id):
+        self.cursor.execute("INSERT INTO likes(username, post_id) VALUES(?, ?)", (username, post_id))
         self.conn.commit()
 
     # Displays likes on a post function
@@ -289,8 +289,9 @@ class Database(object):
         return self.cursor.fetchall()
 
     # Adding a comment function
-    def add_comment(self, comment, id, post_id):
-        self.cursor.execute("INSERT INTO comments(comment, id, post_id) VALUES(?, ?, ?)", (comment, id, post_id))
+    def add_comment(self, comment, username, post_id):
+        self.cursor.execute("INSERT INTO comments(comment, username, post_id) VALUES(?, ?, ?)",
+                            (comment, username, post_id))
         self.conn.commit()
 
     # Display comment function
@@ -344,8 +345,8 @@ def init_post_table():
 # Create a like table
 def init_like_table():
     with sqlite3.connect('blog.db') as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS likes(id INTEGER NOT NULL, post_id TEXT NOT NULL,"
-                     "FOREIGN KEY (id) REFERENCES users(id),"
+        conn.execute("CREATE TABLE IF NOT EXISTS likes(username TEXT NOT NULL, post_id TEXT NOT NULL,"
+                     "FOREIGN KEY (username) REFERENCES users(username),"
                      "FOREIGN KEY (post_id) REFERENCES posts(post_id))")
     print("Like table created successfully.")
 
@@ -355,9 +356,9 @@ def init_comment_table():
     with sqlite3.connect('blog.db') as conn:
         conn.execute("CREATE TABLE IF NOT EXISTS comments(comment_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                      "comment TEXT NOT NULL,"
-                     "id INTEGER NOT NULL,"
+                     "username TEXT NOT NULL,"
                      "post_id TEXT NOT NULL,"
-                     "FOREIGN KEY (id) REFERENCES users(id),"
+                     "FOREIGN KEY (username) REFERENCES users(username),"
                      "FOREIGN KEY (post_id) REFERENCES posts(post_id))")
     print("Comment table created successfully.")
 
@@ -738,10 +739,10 @@ def like_post():
     db = Database()
 
     if request.method == "POST":
-        id = request.form['id']
+        username = request.form['username']
         post_id = request.form['post_id']
 
-        db.like(id, post_id)
+        db.like(username, post_id)
         response['status_code'] = 200
         response['message'] = "Post liked successfully"
         return response
@@ -769,10 +770,10 @@ def add_comment():
 
     if request.method == "POST":
         comment = request.form['comment']
-        id = request.form['id']
+        username = request.form['username']
         post_id = request.form['post_id']
 
-        db.add_comment(comment, id, post_id)
+        db.add_comment(comment, username, post_id)
         response['status_code'] = 200
         response['message'] = "Comment added to post successfully"
         return response
