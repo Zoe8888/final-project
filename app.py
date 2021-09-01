@@ -690,7 +690,6 @@ def edit_post(post_id):
 
 # App route to display all the posts from the database
 @app.route('/show-posts/', methods=["GET"])
-@jwt_required()
 def show_posts():
     db = Database()
     response = {}
@@ -703,7 +702,6 @@ def show_posts():
 
 # App route to view a specific post
 @app.route('/view-post/<int:post_id>/', methods=["GET"])
-@jwt_required()
 def view_post(post_id):
     db = Database()
     response = {}
@@ -718,7 +716,6 @@ def view_post(post_id):
 
 # App route to view a specific users posts
 @app.route('/view-users-posts/<int:id>/', methods=["GET"])
-@jwt_required()
 def view_users_products(id):
     response = {}
     db = Database()
