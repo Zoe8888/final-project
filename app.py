@@ -485,11 +485,11 @@ def registration():
 
     if request.method == "POST":
 
-        name = request.form['name']
-        surname = request.form['surname']
-        email = request.form['email']
-        username = request.form['username']
-        password = request.form['password']
+        name = request.json['name']
+        surname = request.json['surname']
+        email = request.json['email']
+        username = request.json['username']
+        password = request.json['password']
 
         with sqlite3.connect('blog.db') as conn:
             cursor = conn.cursor()
@@ -649,12 +649,12 @@ def create_post():
 
     if request.method == "POST":
         image = request.files['post_image']
-        title = request.form['title']
-        intro = request.form['intro']
-        body = request.form['body']
-        conclusion = request.form['conclusion']
-        author = request.form['author']
-        id = request.form['id']
+        title = request.json['title']
+        intro = request.json['intro']
+        body = request.json['body']
+        conclusion = request.json['conclusion']
+        author = request.json['author']
+        id = request.json['id']
 
         db.create_post(image, title, intro, body, conclusion, author, id)
         response["status_code"] = 200
