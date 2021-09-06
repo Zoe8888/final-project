@@ -648,7 +648,7 @@ def create_post():
     response = {}
 
     if request.method == "POST":
-        image = request.files['post_image']
+        image = request.json['post_image']
         title = request.json['title']
         intro = request.json['intro']
         body = request.json['body']
