@@ -468,9 +468,9 @@ app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(hours=24)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 # Senders email
-app.config['MAIL_USERNAME'] = 'crystalcavecpt@gmail.com'
+app.config['MAIL_USERNAME'] = 'diaryofthehodophiles@gmail.com'
 # Senders password
-app.config['MAIL_PASSWORD'] = 'crysta1Cav3'
+app.config['MAIL_PASSWORD'] = 'hod0ph1l3'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -530,7 +530,7 @@ def registration():
 def send_email(email):
     response = {}
     mail = Mail(app)
-    msg = Message("Welcome!", sender='crystalcavecpt@gmail.com', recipients=[email])
+    msg = Message("Welcome!", sender='diaryofthehodophiles@gmail.com', recipients=[email])
     msg.body = "Good morning/afternoon.\n You have successfully registered your profile on our site.\n" \
                "Please feel free to send us an email if you have any queries or concerns.\n \n" \
                "Kind Regards,\n Crystal Cave Team"
