@@ -207,7 +207,7 @@ class Database(object):
 
         # Edit body of post
         if incoming_data.get('body') is not None:
-            put_data['body'] = incoming_data.get('intro')
+            put_data['body'] = incoming_data.get('body')
             with sqlite3.connect('blog.db') as conn:
                 cursor = conn.cursor()
                 cursor.execute("UPDATE posts SET body =? WHERE post_id=?", (put_data['body'], post_id))
@@ -217,7 +217,7 @@ class Database(object):
 
         # Edit conclusion of post
         if incoming_data.get('conclusion') is not None:
-            put_data['conclusion'] = incoming_data.get('intro')
+            put_data['conclusion'] = incoming_data.get('conclusion')
             with sqlite3.connect('blog.db') as conn:
                 cursor = conn.cursor()
                 cursor.execute("UPDATE posts SET conclusion =? WHERE post_id=?", (put_data['conclusion'], post_id))
@@ -308,6 +308,11 @@ class Database(object):
     def delete_comment(self, value):
         self.cursor.execute("DELETE FROM comments WHERE comment_id='{}'".format(value))
         self.conn.commit()
+
+    # Getting all usernames
+    def fetch_usernames(self):
+        self.cursor.execute("SELECT * FROM username FROM users")
+        return self.cursor.fetchall()
 
 
 # Creating a user table
@@ -817,6 +822,18 @@ def delete_comment(comment_id):
     response['message'] = "Comment successfully deleted"
     return response
 
+
+# App route to get all usernames in the database
+@app.route('/get-usernames/')
+def get_usernames():
+    db = Database()
+    response = {}
+
+    usernames = db.fetch_username()
+    response['status_code'] = 200
+    response['data'] = usernames
+    response['message'] = "All usernames successfully retrieved"
+    return response
 
 if __name__ == '__main__':
     app.run()
