@@ -82,21 +82,25 @@ class Database(object):
 
         # If the user image is edited
         if incoming_data.get('user_image') is not None:
-            put_data['user_image'] = incoming_data.get('user_image')
+            try:
+                put_data['user_image'] = incoming_data.get('user_image')
 
-            cloudinary.config(cloud_name='dxgylrfai', api_key='297452228378499',
-                              api_secret='lMfu9nSDHtFhnaRTiEch_gfzm_A')
-            upload_result = None
-            app.logger.info('%s file_to_upload', put_data['user_image'])
-            if put_data['user_image']:
-                upload_result = cloudinary.uploader.upload(put_data['user_image'])
-                app.logger.info(upload_result)
-            with sqlite3.connect('blog.db') as conn:
-                cursor = conn.cursor()
-                cursor.execute("UPDATE users SET user_image =? WHERE username=?", (upload_result['url'], username))
-                conn.commit()
-                response['status_code'] = 200
-                response['message'] = "User image successfully updated"
+                cloudinary.config(cloud_name='dxgylrfai', api_key='297452228378499',
+                                  api_secret='lMfu9nSDHtFhnaRTiEch_gfzm_A')
+                upload_result = None
+                app.logger.info('%s file_to_upload', put_data['user_image'])
+                if put_data['user_image']:
+                    upload_result = cloudinary.uploader.upload(put_data['user_image'])
+                    app.logger.info(upload_result)
+                with sqlite3.connect('blog.db') as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE users SET user_image =? WHERE username=?", (upload_result['url'], username))
+                    conn.commit()
+                    response['status_code'] = 200
+                    response['message'] = "User image successfully updated"
+            except ValueError:
+                response['status_code'] = 400
+                response['message'] = "Error in parsing image for cloudinary"
 
         # If the name is edited
         if incoming_data.get('name') is not None:
@@ -311,7 +315,7 @@ class Database(object):
 
     # Getting all usernames
     def fetch_usernames(self):
-        self.cursor.execute("SELECT * FROM username FROM users")
+        self.cursor.execute("SELECT username FROM users")
         return self.cursor.fetchall()
 
 
@@ -824,16 +828,17 @@ def delete_comment(comment_id):
 
 
 # App route to get all usernames in the database
-@app.route('/get-usernames/')
+@app.route('/get-usernames/', methods=["GET"])
 def get_usernames():
     db = Database()
     response = {}
 
-    usernames = db.fetch_username()
+    usernames = db.fetch_usernames()
     response['status_code'] = 200
     response['data'] = usernames
     response['message'] = "All usernames successfully retrieved"
     return response
+
 
 if __name__ == '__main__':
     app.run()
