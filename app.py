@@ -748,7 +748,7 @@ def view_users_products(id):
 
 
 # App route to like a post
-@app.route('/like-post/', methods=["POST"])
+@app.route('/like-post/', methods=["POST", "PATCH"])
 @jwt_required()
 def like_post():
     response = {}
