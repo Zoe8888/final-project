@@ -318,6 +318,11 @@ class Database(object):
         self.cursor.execute("SELECT username FROM users")
         return self.cursor.fetchall()
 
+    # Creating a search bar function
+    def search(self, title):
+        self.cursor.execute("SELECT * FROM posts WHERE title LIKE '%{}%'".format(title))
+        return self.cursor.fetchall()
+
 
 # Creating a user table
 def init_user_table():
@@ -837,6 +842,19 @@ def get_usernames():
     response['status_code'] = 200
     response['data'] = usernames
     response['message'] = "All usernames successfully retrieved"
+    return response
+
+
+# App route to search blog posts
+@app.route('/search/<post_query>/', methods=["GET"])
+def search(post_query):
+    db = Database()
+    response = {}
+
+    results = db.search(post_query)
+    response['status_code'] = 200
+    response['data'] = results
+    response['message'] = "Search results retrieved successfully"
     return response
 
 
