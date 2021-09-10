@@ -287,6 +287,11 @@ class Database(object):
         self.cursor.execute("INSERT INTO likes(username, post_id) VALUES(?, ?)", (username, post_id))
         self.conn.commit()
 
+    # Creating a function to unlike a post
+    def unlike(self, username, post_id):
+        self.cursor.execute("DELETE FROM likes WHERE username='{}' AND post_id='{}'".format(username, post_id))
+        self.conn.commit()
+
     # Displays likes on a post function
     def display_likes(self, post_id):
         self.cursor.execute("SELECT * FROM likes WHERE post_id='{}'".format(post_id))
@@ -756,6 +761,15 @@ def like_post():
         db.like(username, post_id)
         response['status_code'] = 200
         response['message'] = "Post liked successfully"
+        return response
+
+    if request.method == "PATCH":
+        username = request.json['username']
+        post_id = request.json['post_id']
+
+        db.unlike(username, post_id)
+        response['status_code'] = 200
+        response['message'] = "Post unliked successfully"
         return response
 
 
