@@ -549,10 +549,12 @@ def registration():
 def send_email(email):
     response = {}
     mail = Mail(app)
-    msg = Message("Welcome!", sender='diaryofthehodophiles@gmail.com', recipients=[email])
-    msg.body = "Good morning/afternoon.\n You have successfully registered your profile on our site.\n" \
-               "Please feel free to send us an email if you have any queries or concerns.\n \n" \
-               "Kind Regards,\n Crystal Cave Team"
+    msg = Message("Welcome fellow Hodophile!", sender='diaryofthehodophiles@gmail.com', recipients=[email])
+    msg.body = "Greetings beautiful being.\n " \
+               "Thank you for subscribing and choosing to be a part of our virtual tribe.\n" \
+               "We hope you enjoy creating content of your own content as much as we'll enjoy reading it.\n" \
+               "Please feel free to send us an email if you have any questions or concerns.\n \n" \
+               "Kind Regards,\n Diary of the Hodophiles Team"
     mail.send(msg)
 
     response["message"] = "New user successfully registered"
